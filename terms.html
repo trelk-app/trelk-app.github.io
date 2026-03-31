@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Trelk</title>
+  <meta name="description" content="Trelk Terms of Service.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D0D0F;
+      --bg-secondary: #16161A;
+      --surface: #1C1C22;
+      --border: #2A2A32;
+      --accent: #DAA520;
+      --text: #F0F0F2;
+      --text-secondary: #A0A0A8;
+      --text-tertiary: #68686E;
+      --max-width: 800px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background: rgba(13, 13, 15, 0.8);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container { display: flex; align-items: center; justify-content: space-between; height: 64px; max-width: 1200px; }
+    .nav-logo { font-size: 22px; font-weight: 800; color: var(--accent); text-decoration: none; letter-spacing: -0.5px; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .legal { padding: 120px 0 80px; }
+    .legal h1 {
+      font-size: 36px; font-weight: 800; letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+    .legal .updated {
+      color: var(--text-tertiary); font-size: 14px; margin-bottom: 48px;
+    }
+    .legal h2 {
+      font-size: 20px; font-weight: 700; margin-top: 40px; margin-bottom: 12px;
+      color: var(--text);
+    }
+    .legal p, .legal li {
+      color: var(--text-secondary); font-size: 15px; margin-bottom: 12px;
+    }
+    .legal ul { padding-left: 24px; margin-bottom: 12px; }
+    .legal li { margin-bottom: 6px; }
+    .legal a { color: var(--accent); text-decoration: none; }
+    .legal a:hover { text-decoration: underline; }
+    .legal .caps {
+      text-transform: none; font-size: 14px; line-height: 1.6;
+    }
+
+    footer { border-top: 1px solid var(--border); padding: 40px 0; margin-top: 60px; }
+    footer .container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; }
+    .footer-left { color: var(--text-tertiary); font-size: 13px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: var(--text-tertiary); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text-secondary); }
+
+    @media (max-width: 640px) {
+      .legal h1 { font-size: 28px; }
+      footer .container { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-logo">Trelk</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/privacy">Privacy</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="legal">
+      <h1>Terms of Service</h1>
+      <p class="updated">Last updated: March 29, 2026</p>
+
+      <h2>1. Acceptance of Terms</h2>
+      <p>By downloading, installing, or using Trelk ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the App.</p>
+
+      <h2>2. License</h2>
+      <p>We grant you a limited, non-exclusive, non-transferable, revocable license to use the App for personal, non-commercial purposes on devices you own or control, subject to these Terms.</p>
+
+      <h2>3. Description of Service</h2>
+      <p>Trelk is a personal knowledge management application that runs on your device. It allows you to save, organize, review, and explore articles, papers, notes, and other content. The App processes your content locally using on-device AI models.</p>
+
+      <h2>4. Your Content</h2>
+      <p>You retain all rights to the content you save, create, or import into the App. We do not claim ownership of your content. Since all data is stored on your device and optionally synchronized to your personal cloud accounts, you are solely responsible for maintaining backups of your data.</p>
+
+      <h2>5. Community Collections</h2>
+      <p>The App includes access to community-curated reading lists hosted on GitHub ("Community Collections"). By submitting a collection for inclusion in the community repository:</p>
+      <ul>
+        <li>You grant us a non-exclusive, worldwide, royalty-free license to distribute the submitted collection through the App and associated repositories.</li>
+        <li><strong>We reserve the right to accept, decline, modify, or remove any community collection submission at our sole discretion</strong>, for any reason, including but not limited to quality, relevance, appropriateness, or alignment with the App's purpose.</li>
+        <li>Community Collections contain curated lists of publicly available content (URLs, titles, descriptions). They do not contain the full text of any copyrighted material.</li>
+      </ul>
+
+      <h2>6. Acceptable Use</h2>
+      <p>You agree not to:</p>
+      <ul>
+        <li>Reverse-engineer, decompile, or disassemble the App, except as permitted by applicable law</li>
+        <li>Use the App to infringe upon the intellectual property rights of others</li>
+        <li>Redistribute, sublicense, or resell the App</li>
+        <li>Use the App for any unlawful purpose</li>
+      </ul>
+
+      <h2>7. Third-Party Services</h2>
+      <p>The App may interact with third-party services (cloud storage providers, AI providers) that you choose to configure. Your use of those services is subject to their own terms. We are not responsible for the availability, accuracy, or practices of any third-party service.</p>
+
+      <h2>8. Intellectual Property</h2>
+      <p>The App, including its design, code, branding, and on-device AI models, is owned by Nuno Fonseca and protected by applicable intellectual property laws. The Trelk name and logo are trademarks of Nuno Fonseca.</p>
+
+      <h2>9. Disclaimer of Warranties</h2>
+      <p class="caps">THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE APP WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE OF HARMFUL COMPONENTS.</p>
+
+      <h2>10. Limitation of Liability</h2>
+      <p class="caps">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL WE BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF DATA, PROFITS, OR REVENUE, ARISING OUT OF OR RELATED TO YOUR USE OF THE APP, REGARDLESS OF THE THEORY OF LIABILITY.</p>
+
+      <h2>11. Data Loss</h2>
+      <p>Since all data is stored locally on your device and optionally synchronized to your personal cloud accounts, we are not responsible for any data loss resulting from device failure, accidental deletion, cloud service interruptions, or any other cause. You are solely responsible for maintaining adequate backups.</p>
+
+      <h2>12. Modifications</h2>
+      <p>We reserve the right to modify these Terms at any time. Updated Terms will be posted on this page. Your continued use of the App after modifications constitutes acceptance of the revised Terms.</p>
+
+      <h2>13. Termination</h2>
+      <p>We may terminate or suspend your access to the App at any time, without prior notice, for conduct that we believe violates these Terms or is harmful to other users of the App, us, or third parties, or for any other reason.</p>
+
+      <h2>14. Governing Law</h2>
+      <p>These Terms shall be governed by and construed in accordance with the laws of Portugal, without regard to its conflict of law provisions.</p>
+
+      <h2>15. Severability</h2>
+      <p>If any provision of these Terms is found to be unenforceable, the remaining provisions shall continue in full force and effect.</p>
+
+      <h2>16. Contact</h2>
+      <p>If you have questions about these Terms, contact us at: <a href="mailto:hello@trelk.app">hello@trelk.app</a></p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-left">&copy; 2026 Trelk. Made with care in Portugal.</div>
+      <div class="footer-links">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="https://github.com/trelk-app/collections">Community</a>
+        <a href="mailto:hello@trelk.app">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

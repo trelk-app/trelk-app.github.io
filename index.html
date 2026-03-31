@@ -1,63 +1,809 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trelk — Remember What You Read</title>
-    <meta name="description" content="Trelk is a reading retention app. Save, learn, and truly remember. Coming soon.">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trelk — Read, Think, Connect</title>
+  <meta name="description" content="Your personal knowledge base. Save articles, papers, and notes. AI connects your ideas. Remember what matters.">
+  <meta property="og:title" content="Trelk — Read, Think, Connect">
+  <meta property="og:description" content="Your personal knowledge base. Save articles, papers, and notes. AI connects your ideas.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://trelk.app">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D0D0F;
+      --bg-secondary: #16161A;
+      --surface: #1C1C22;
+      --border: #2A2A32;
+      --accent: #DAA520;
+      --accent-glow: rgba(218, 165, 32, 0.15);
+      --text: #F0F0F2;
+      --text-secondary: #A0A0A8;
+      --text-tertiary: #68686E;
+      --success: #3DB870;
+      --blue: #6BA8F0;
+      --purple: #B07DDB;
+      --red: #E86060;
+      --teal: #4DBBAA;
+      --max-width: 1200px;
+    }
 
-        body {
-            background: #0a0a0a;
-            color: #f5f5f5;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            padding: 2rem;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .container {
-            max-width: 480px;
-        }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #d4a017;
-            margin-bottom: 1rem;
-        }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
 
-        p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #999;
-            margin-bottom: 2rem;
-        }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
 
-        .badge {
-            display: inline-block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #d4a017;
-            border: 1px solid #d4a01744;
-            padding: 0.4rem 1rem;
-            border-radius: 2px;
-        }
-    </style>
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background: rgba(13, 13, 15, 0.8);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .nav-logo { font-size: 22px; font-weight: 800; color: var(--accent); text-decoration: none; letter-spacing: -0.5px; }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent) !important; color: var(--bg) !important;
+      padding: 8px 20px; border-radius: 8px; font-weight: 600 !important; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.9; }
+
+    /* ─── HERO ─── */
+    .hero { padding: 160px 0 80px; text-align: center; position: relative; }
+    .hero::before {
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+      font-size: 13px; color: var(--text-secondary); margin-bottom: 32px;
+    }
+    .hero-badge span { color: var(--accent); font-weight: 600; }
+    .hero h1 {
+      font-size: clamp(48px, 8vw, 80px); font-weight: 800; line-height: 1.05;
+      letter-spacing: -2px; margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, #F0C050 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: 20px; color: var(--text-secondary); max-width: 580px; margin: 0 auto 40px; line-height: 1.7; }
+    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px;
+      background: var(--accent); color: var(--bg); font-size: 16px; font-weight: 700;
+      border-radius: 12px; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px;
+      background: var(--surface); color: var(--text); font-size: 16px; font-weight: 600;
+      border-radius: 12px; text-decoration: none; border: 1px solid var(--border); transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--text-tertiary); }
+
+    /* ─── SCREENSHOT ─── */
+    .screenshot-section { padding: 40px 0 80px; text-align: center; }
+    .screenshot-frame {
+      max-width: 320px; margin: 0 auto; border-radius: 32px; overflow: hidden;
+      border: 2px solid var(--border);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      background: var(--surface);
+    }
+    .screenshot-frame img { width: 100%; display: block; }
+    .screenshot-placeholder {
+      width: 100%; aspect-ratio: 9/19.5;
+      background: linear-gradient(180deg, var(--surface) 0%, var(--bg-secondary) 100%);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-tertiary); font-size: 14px;
+    }
+
+    /* ─── SECTION SHARED ─── */
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-header h2 { font-size: 40px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .section-header p { font-size: 18px; color: var(--text-secondary); max-width: 560px; margin: 0 auto; }
+
+    /* ─── FEATURES (5 TABS) ─── */
+    .features { padding: 80px 0; }
+    .tab-row {
+      display: flex; justify-content: center; gap: 8px; margin-bottom: 48px; flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 10px 24px; border-radius: 100px; border: 1px solid var(--border);
+      background: transparent; color: var(--text-secondary); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .tab-btn:hover { border-color: var(--text-tertiary); color: var(--text); }
+    .tab-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; transition: all 0.3s;
+    }
+    .feature-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .feature-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-it-works { padding: 80px 0; border-top: 1px solid var(--border); }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+    .step { text-align: center; position: relative; }
+    .step-number {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--accent); color: var(--bg);
+      font-size: 20px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ─── DEEP DIVE (alternating left/right) ─── */
+    .deep-dive { padding: 80px 0; border-top: 1px solid var(--border); }
+    .deep-dive-block { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 80px; }
+    .deep-dive-block:last-child { margin-bottom: 0; }
+    .deep-dive-block.reverse .dd-text { order: 2; }
+    .deep-dive-block.reverse .dd-visual { order: 1; }
+    .dd-text h2 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .dd-text p { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    .dd-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .dd-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .dd-list li::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 7px; }
+    .dd-visual {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
+      color: var(--text-tertiary); font-size: 14px; overflow: hidden;
+    }
+
+    /* ─── TECH ─── */
+    .tech-section { padding: 80px 0; border-top: 1px solid var(--border); }
+    .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .tech-item {
+      text-align: center; padding: 24px 16px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    }
+    .tech-item .emoji { font-size: 28px; margin-bottom: 12px; }
+    .tech-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .tech-item p { font-size: 12px; color: var(--text-tertiary); }
+
+    /* ─── CTA ─── */
+    .cta-section { padding: 100px 0; text-align: center; position: relative; }
+    .cta-section::before {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 { font-size: 48px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; }
+    .cta-section p { font-size: 18px; color: var(--text-secondary); max-width: 480px; margin: 0 auto 40px; }
+
+    /* ─── FOOTER ─── */
+    footer { border-top: 1px solid var(--border); padding: 40px 0; }
+    footer .container { display: flex; justify-content: space-between; align-items: center; }
+    .footer-left { color: var(--text-tertiary); font-size: 13px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: var(--text-tertiary); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text-secondary); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .deep-dive-block { grid-template-columns: 1fr; }
+      .deep-dive-block.reverse .dd-text { order: 1; }
+      .deep-dive-block.reverse .dd-visual { order: 2; }
+      .tech-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero h1 { font-size: 40px; letter-spacing: -1px; }
+      .hero p { font-size: 17px; }
+      footer .container { flex-direction: column; gap: 16px; }
+      .tab-btn { padding: 8px 16px; font-size: 13px; }
+    }
+
+    /* ─── BUY ONCE BANNER ─── */
+    .buy-once {
+      padding: 60px 0; text-align: center;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg) 100%);
+    }
+    .buy-once .container { max-width: 720px; }
+    .buy-once h2 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+    .buy-once h2 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, #F0C050 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .buy-once p { font-size: 17px; color: var(--text-secondary); line-height: 1.7; max-width: 600px; margin: 0 auto; }
+    .buy-once-pills { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+    .buy-once-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-secondary); font-size: 13px; font-weight: 500;
+    }
+    .buy-once-pill .check { color: var(--success); font-weight: 700; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate { animation: fadeUp 0.6s ease-out forwards; opacity: 0; }
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.3s; }
+  </style>
 </head>
 <body>
+
+  <!-- NAV -->
+  <nav>
     <div class="container">
-        <h1>Trelk</h1>
-        <p>Remember what you read.<br>Coming soon.</p>
-        <span class="badge">Buy once. Own forever.</span>
+      <a href="/" class="nav-logo">Trelk</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#technology">Technology</a>
+        <a href="#download" class="nav-cta">Get Trelk</a>
+      </div>
     </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge animate">
+        <span>Buy once.</span> No subscriptions, ever.
+      </div>
+      <h1 class="animate animate-delay-1">Read. Think.<br><em>Connect ideas.</em></h1>
+      <p class="animate animate-delay-2">
+        Save articles, papers, and notes. Write your thoughts. AI discovers hidden connections across everything you read. Build a knowledge base that grows with you.
+      </p>
+      <div class="hero-actions animate animate-delay-3">
+        <a href="#features" class="btn-primary">
+          Explore features
+        </a>
+        <a href="#download" class="btn-secondary">
+          App Store &amp; Google Play
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOT -->
+  <section class="screenshot-section">
+    <div class="container">
+      <div class="screenshot-frame">
+        <div class="screenshot-placeholder">
+          Screenshot placeholder<br>Replace with app screenshot
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUY ONCE -->
+  <section class="buy-once">
+    <div class="container">
+      <h2>Pay once. <em>Own it forever.</em></h2>
+      <p>No subscriptions. No monthly fees. No usage limits. One purchase gives you the full app, every feature, and every future update. Your knowledge base runs on your device — not on our servers.</p>
+      <div class="buy-once-pills">
+        <div class="buy-once-pill"><span class="check">&#10003;</span> One-time purchase</div>
+        <div class="buy-once-pill"><span class="check">&#10003;</span> All features included</div>
+        <div class="buy-once-pill"><span class="check">&#10003;</span> Free updates</div>
+        <div class="buy-once-pill"><span class="check">&#10003;</span> No account required</div>
+        <div class="buy-once-pill"><span class="check">&#10003;</span> Works fully offline</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FEATURES — organized by the 5 app tabs
+       ═══════════════════════════════════════════ -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Five screens. Zero friction.<br>Total knowledge control.</h2>
+        <p>Every capability you need to capture, understand, connect, retain, and grow what you know.</p>
+      </div>
+
+      <div class="tab-row">
+        <button class="tab-btn active" data-tab="library">Library</button>
+        <button class="tab-btn" data-tab="pulse">Pulse</button>
+        <button class="tab-btn" data-tab="ask">Ask</button>
+        <button class="tab-btn" data-tab="knowledge">Knowledge</button>
+        <button class="tab-btn" data-tab="settings">Settings</button>
+      </div>
+
+      <!-- LIBRARY TAB -->
+      <div class="tab-panel active" id="tab-library">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(218,165,32,0.15);"><span>📥</span></div>
+            <h3>Capture from anywhere</h3>
+            <p>Share a URL from any browser, paste a link, scan a QR code, import PDFs, DOCX, Markdown, or plain text files. Everything lands in one place.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(107,168,240,0.15);"><span>🤖</span></div>
+            <h3>Auto-process pipeline</h3>
+            <p>Every item is automatically extracted, summarized, tagged, embedded, and clustered. Watch the processing status in real time as AI works through each step.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(61,184,112,0.15);"><span>🔍</span></div>
+            <h3>Hybrid search</h3>
+            <p>Find anything instantly with full-text keyword search combined with semantic vector search. Results ranked by BM25 + cosine similarity fused via Reciprocal Rank Fusion.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(176,125,219,0.15);"><span>📂</span></div>
+            <h3>Collections &amp; tags</h3>
+            <p>Organize items into collections. AI-generated tags applied automatically. Filter by content type, read status, date range, starred items, or any combination.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(232,96,96,0.15);"><span>✋</span></div>
+            <h3>Bulk operations</h3>
+            <p>Long-press to select, then star, tag, mark read, add to collection, reprocess, or delete multiple items at once. Swipe gestures for quick single-item actions.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(77,187,170,0.15);"><span>🌐</span></div>
+            <h3>Community collections</h3>
+            <p>Browse and import curated collections published by the community. One-tap import adds entire reading lists to your library with full AI processing.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(218,165,32,0.15);"><span>✍️</span></div>
+            <h3>Rich note editor</h3>
+            <p>Full markdown editor with toolbar: bold, italic, strikethrough, headings, bullet and numbered lists, blockquotes, code blocks, links, images from camera or gallery.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(107,168,240,0.15);"><span>📖</span></div>
+            <h3>Built-in reader</h3>
+            <p>Read articles in a clean WebView, PDFs with native rendering, and markdown with styled typography. Auto-marks items as read when you open them.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(61,184,112,0.15);"><span>📊</span></div>
+            <h3>Item detail &amp; connections</h3>
+            <p>Every item shows its AI summary, tags, word count, reading time, related reading suggestions with reasons, and semantic connections to other items.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PULSE TAB -->
+      <div class="tab-panel" id="tab-pulse">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(232,96,96,0.15);"><span>🧠</span></div>
+            <h3>Flash review cards</h3>
+            <p>AI generates review questions from your saved items. Tap to reveal answers, rate your recall (Forgot / Hard / Remembered), and the algorithm schedules optimal next review.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(218,165,32,0.15);"><span>📈</span></div>
+            <h3>Streaks &amp; statistics</h3>
+            <p>Track your reading streak, items reviewed today, and retention score. A 14-day accuracy trend chart shows your review performance over time.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(107,168,240,0.15);"><span>📝</span></div>
+            <h3>Daily synthesis</h3>
+            <p>AI-generated daily briefing summarizes your recent reading and surfaces patterns. Previous briefings are saved and searchable. Dive deeper via "Explore in Ask".</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(61,184,112,0.15);"><span>🔗</span></div>
+            <h3>Fresh connections</h3>
+            <p>Newly discovered bi-directional connections between items. See why two articles or papers relate, with an AI-generated explanation and one-tap navigation.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(176,125,219,0.15);"><span>📚</span></div>
+            <h3>Suggested next reads</h3>
+            <p>AI recommends what to read next based on your reading history, knowledge gaps, and current interests. Launch directly into the reader from the suggestion.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(77,187,170,0.15);"><span>🔔</span></div>
+            <h3>Scheduled digest</h3>
+            <p>Configure a daily notification at your preferred time. The digest arrives as a push notification, pulling you back into your review session when it matters.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASK TAB -->
+      <div class="tab-panel" id="tab-ask">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(107,168,240,0.15);"><span>💬</span></div>
+            <h3>Chat with your library</h3>
+            <p>Ask any question and get answers grounded in your saved content. The AI retrieves relevant passages using semantic search (RAG) and cites specific sources.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(218,165,32,0.15);"><span>📎</span></div>
+            <h3>Source citations</h3>
+            <p>Every AI response shows clickable source pills [1] [2] [3] linking to the exact items referenced. Tap any citation to jump straight to that article or paper.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(176,125,219,0.15);"><span>🔄</span></div>
+            <h3>Streaming responses</h3>
+            <p>Watch AI responses appear in real time with streaming output. Cancel mid-stream, regenerate, or start a new thread at any point.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(61,184,112,0.15);"><span>💡</span></div>
+            <h3>Suggested questions</h3>
+            <p>AI-generated starter prompts based on your library content. Useful when you want to explore but aren't sure what to ask.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(232,96,96,0.15);"><span>📋</span></div>
+            <h3>Conversation history</h3>
+            <p>All conversations are saved and searchable. Switch between threads, rename them, or delete old ones. Pick up any conversation exactly where you left off.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(77,187,170,0.15);"><span>🤖</span></div>
+            <h3>Choose your AI engine</h3>
+            <p>Chat powered by local on-device AI, OpenAI, or Anthropic. Switch providers anytime. The active model is always shown so you know who's answering.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KNOWLEDGE TAB -->
+      <div class="tab-panel" id="tab-knowledge">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(218,165,32,0.15);"><span>🗺️</span></div>
+            <h3>Cluster map</h3>
+            <p>A 2D scatter plot of your entire library, grouped by semantic similarity. Color-coded clusters show how your knowledge self-organizes. Pinch to zoom, tap to explore.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(107,168,240,0.15);"><span>🕸️</span></div>
+            <h3>Interactive knowledge graph</h3>
+            <p>Force-directed graph visualization where nodes are items and edges are discovered connections. Zoom, pan, and tap any node to see its relationships.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(61,184,112,0.15);"><span>🔬</span></div>
+            <h3>AI-generated insights</h3>
+            <p>Per-cluster analysis explaining what each cluster contains, why items are grouped, and what patterns emerge. Includes search suggestions to deepen your knowledge.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(176,125,219,0.15);"><span>📈</span></div>
+            <h3>Growth tracking</h3>
+            <p>Track how your knowledge base grows over time. See which topics are expanding, where the gaps are, and how your clusters evolve with new content.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(232,96,96,0.15);"><span>🏷️</span></div>
+            <h3>Cluster detail</h3>
+            <p>Dive into any cluster to see all member items, cluster metadata, and cross-cluster connections. Navigate directly to items or related clusters.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(77,187,170,0.15);"><span>🔄</span></div>
+            <h3>Rebuild on demand</h3>
+            <p>Clusters update automatically as you add content. Force a full rebuild anytime to re-analyze your entire library with fresh clustering.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div class="tab-panel" id="tab-settings">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(107,168,240,0.15);"><span>🤖</span></div>
+            <h3>AI provider control</h3>
+            <p>Choose between fully local on-device AI, OpenAI, or Anthropic for analysis. Set embedding source independently. Bring your own API keys with built-in validation.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(61,184,112,0.15);"><span>☁️</span></div>
+            <h3>Cloud sync</h3>
+            <p>Sync your library across devices via iCloud (iOS), OneDrive, Google Drive, or Dropbox. One-tap backup and restore. Automatic conflict resolution.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(218,165,32,0.15);"><span>🎨</span></div>
+            <h3>Appearance</h3>
+            <p>Light, dark, or system-follow theme. Multi-language support with full localization. Tablet-optimized layouts for larger screens.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(176,125,219,0.15);"><span>📥</span></div>
+            <h3>Import &amp; export</h3>
+            <p>Import libraries from JSON or CSV with field mapping preview. Export your entire library for backup or migration. Full data portability.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(232,96,96,0.15);"><span>📦</span></div>
+            <h3>Model management</h3>
+            <p>Download or delete local AI and embedding models on demand. See model sizes, download progress, and manage storage. Wi-Fi-only processing option.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(77,187,170,0.15);"><span>🔔</span></div>
+            <h3>Notification control</h3>
+            <p>Enable daily digest notifications and set your preferred delivery time. Weekly knowledge gap alerts keep you on track.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2>How it works</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Save</h3>
+          <p>Share a URL from any app, scan a QR code, drop in a PDF, or write a note. Trelk accepts articles, papers, docs, and plain text.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Process</h3>
+          <p>AI extracts content, writes a summary, generates tags, creates vector embeddings, discovers connections, and assigns clusters. Fully automatic.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Connect</h3>
+          <p>Your knowledge graph grows with every item. Related pieces link together, clusters emerge, cross-topic bridges surface, and insights are generated.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3>Remember</h3>
+          <p>Spaced repetition flash cards, daily synthesis briefings, and reading streak tracking help you retain what matters and build on what you know.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEEP DIVE: KNOWLEDGE GRAPH -->
+  <section class="deep-dive">
+    <div class="container">
+      <div class="deep-dive-block">
+        <div class="dd-text">
+          <h2>Your ideas,<br>beautifully connected</h2>
+          <p>
+            Trelk automatically discovers relationships between everything you save. Articles connect to papers. Notes link to documentation. Your personal knowledge graph reveals patterns you'd never see otherwise.
+          </p>
+          <ul class="dd-list">
+            <li>Force-directed graph with zoom, pan, and tap-to-explore</li>
+            <li>Cluster map projects your library into a semantic 2D landscape</li>
+            <li>Cross-topic bridges highlighted in gold</li>
+            <li>AI explains why items connect and how clusters relate</li>
+            <li>Growth tracking shows how your knowledge evolves</li>
+          </ul>
+        </div>
+        <div class="dd-visual">
+          Graph screenshot placeholder
+        </div>
+      </div>
+
+      <div class="deep-dive-block reverse">
+        <div class="dd-text">
+          <h2>Ask anything.<br>Get grounded answers.</h2>
+          <p>
+            Your library becomes a living expert. Ask questions in natural language and get AI responses that cite specific articles, papers, and notes from your collection.
+          </p>
+          <ul class="dd-list">
+            <li>Retrieval-Augmented Generation across your entire library</li>
+            <li>Clickable source citations link to the original items</li>
+            <li>Full conversation history, saved and searchable</li>
+            <li>Works with local AI, OpenAI, or Anthropic</li>
+            <li>Suggested questions to help you explore</li>
+          </ul>
+        </div>
+        <div class="dd-visual">
+          Ask screenshot placeholder
+        </div>
+      </div>
+
+      <div class="deep-dive-block">
+        <div class="dd-text">
+          <h2>Never forget<br>what you've read</h2>
+          <p>
+            The Pulse tab turns passive reading into active retention. AI-generated flash cards test your recall, while daily briefings and streak tracking keep you engaged.
+          </p>
+          <ul class="dd-list">
+            <li>Spaced repetition with smart scheduling (Forgot / Hard / Remembered)</li>
+            <li>Daily AI synthesis of your recent reading</li>
+            <li>14-day accuracy trend chart and retention score</li>
+            <li>Fresh connection alerts when new links are discovered</li>
+            <li>Curated next-read suggestions based on your interests</li>
+          </ul>
+        </div>
+        <div class="dd-visual">
+          Pulse screenshot placeholder
+        </div>
+      </div>
+
+      <div class="deep-dive-block reverse">
+        <div class="dd-text">
+          <h2>Community collections.<br>Open-source knowledge.</h2>
+          <p>
+            Browse and import curated reading lists published by the community on GitHub. Anyone can submit a collection — a set of articles, papers, or resources around a topic. Import one and Trelk processes every item, then connects them to your existing notes and documents through embeddings.
+          </p>
+          <ul class="dd-list">
+            <li>Open-source collections hosted on GitHub — browse, import, contribute</li>
+            <li>One-tap import adds an entire reading list with full AI processing</li>
+            <li>Imported items automatically link to your own notes and documents</li>
+            <li>Embeddings reveal how community content relates to what you already know</li>
+            <li>Submit your own collections back to the community</li>
+          </ul>
+        </div>
+        <div class="dd-visual">
+          Community Collections screenshot placeholder
+        </div>
+      </div>
+
+      <div class="deep-dive-block">
+        <div class="dd-text">
+          <h2>Write your thoughts.<br>Connect them to everything.</h2>
+          <p>
+            Trelk isn't just a reader — it's a note-taking tool. The built-in markdown editor lets you capture your own ideas, and those notes become first-class items in your knowledge graph, linked to articles, papers, and community content through semantic connections.
+          </p>
+          <ul class="dd-list">
+            <li>Full markdown editor with formatting toolbar and live preview</li>
+            <li>Bold, italic, strikethrough, headings, lists, code blocks, blockquotes</li>
+            <li>Insert images from camera or photo gallery directly into notes</li>
+            <li>Notes are embedded, clustered, and connected like any other item</li>
+            <li>Auto-save, undo/redo, and auto-continuing numbered lists</li>
+            <li>Ask AI questions about your notes alongside your saved articles</li>
+          </ul>
+        </div>
+        <div class="dd-visual">
+          Note Editor screenshot placeholder
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNOLOGY -->
+  <section class="tech-section" id="technology">
+    <div class="container">
+      <div class="section-header">
+        <h2>Built different</h2>
+        <p>Privacy-first, offline-capable, powered by cutting-edge AI running on your device.</p>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="emoji">🔒</div>
+          <h4>Privacy first</h4>
+          <p>Your data stays on your device. No accounts required.</p>
+        </div>
+        <div class="tech-item">
+          <div class="emoji">📴</div>
+          <h4>Works offline</h4>
+          <p>Local AI models run entirely on your phone.</p>
+        </div>
+        <div class="tech-item">
+          <div class="emoji">🔍</div>
+          <h4>Hybrid search</h4>
+          <p>BM25 + vector embeddings fused via RRF.</p>
+        </div>
+        <div class="tech-item">
+          <div class="emoji">🤖</div>
+          <h4>Your choice of AI</h4>
+          <p>Local, OpenAI, or Anthropic. You pick.</p>
+        </div>
+        <div class="tech-item">
+          <div class="emoji">📊</div>
+          <h4>Semantic clusters</h4>
+          <p>Agglomerative clustering with 2D projection.</p>
+        </div>
+        <div class="tech-item">
+          <div class="emoji">🧬</div>
+          <h4>Vector embeddings</h4>
+          <p>768-dim ONNX embeddings for deep understanding.</p>
+        </div>
+        <div class="tech-item">
+          <div class="emoji">🌐</div>
+          <h4>Community collections</h4>
+          <p>Import curated reading lists from the community.</p>
+        </div>
+        <div class="tech-item">
+          <div class="emoji">📱</div>
+          <h4>Cross-platform</h4>
+          <p>Android &amp; iOS. Phone &amp; tablet optimized.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="download">
+    <div class="container">
+      <h2>Start building your<br>knowledge base</h2>
+      <p>Buy once, use forever. No subscriptions. Your knowledge, your device, your control.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary">
+          <svg width="20" height="24" viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          App Store
+        </a>
+        <a href="#" class="btn-primary" style="background: var(--text); color: var(--bg);">
+          <svg width="20" height="22" viewBox="0 0 512 512" fill="currentColor"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+          Google Play
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        &copy; 2026 Trelk. Made with care in Portugal.
+      </div>
+      <div class="footer-links">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="https://github.com/trelk-app/collections">Community</a>
+        <a href="mailto:support@trelk.app">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        // Re-trigger animations on newly visible cards
+        document.querySelectorAll('#tab-' + btn.dataset.tab + ' .feature-card').forEach(el => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; }, 50);
+        });
+      });
+    });
+
+    // Intersection Observer for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .step, .tech-item, .deep-dive-block').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'all 0.5s ease-out';
+      observer.observe(el);
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+
 </body>
 </html>
-
