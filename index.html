@@ -1,81 +1,983 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trelk — Remember What You Read</title>
-    <meta name="description" content="Trelk is a reading retention app. Save, learn, and truly remember. Coming soon.">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trelk — Read, Think, Connect</title>
+  <meta name="description" content="Your personal knowledge base. Save articles, papers, and notes. AI connects your ideas. Remember what matters.">
+  <meta property="og:title" content="Trelk — Read, Think, Connect">
+  <meta property="og:description" content="Your personal knowledge base. Save articles, papers, and notes. AI connects your ideas.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://trelk.app">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D0D0F;
+      --bg-secondary: #16161A;
+      --surface: #1C1C22;
+      --border: #2A2A32;
+      --accent: #DAA520;
+      --accent-glow: rgba(218, 165, 32, 0.15);
+      --text: #F0F0F2;
+      --text-secondary: #A0A0A8;
+      --text-tertiary: #68686E;
+      --max-width: 1200px;
+    }
 
-        body {
-            background: #0a0a0a;
-            color: #f5f5f5;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            padding: 2rem;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .container {
-            max-width: 480px;
-        }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #d4a017;
-            margin-bottom: 1rem;
-        }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #999;
-            margin-bottom: 2rem;
-        }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
-        .badge {
-            display: inline-block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #d4a017;
-            border: 1px solid #d4a01744;
-            padding: 0.4rem 1rem;
-            border-radius: 2px;
-        }
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(13,13,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      height: 64px;
+    }
+    nav .container { display: flex; align-items: center; height: 100%; }
+    .nav-logo { font-weight: 800; font-size: 20px; color: var(--accent); letter-spacing: -0.5px; text-decoration: none; }
+    .nav-links { margin-left: auto; display: flex; align-items: center; gap: 28px; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.btn-nav, .nav-links a.btn-nav:hover { background: var(--accent); color: #fff; padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; transform: none; box-shadow: none; }
 
-        .links {
-            margin-top: 2rem;
-            font-size: 0.8rem;
-        }
+    /* HERO */
+    .hero {
+      padding: 160px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 6px 16px; border-radius: 100px;
+      font-size: 13px; color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    .hero-badge strong { color: var(--accent); }
+    .hero h1 {
+      font-size: clamp(42px, 7vw, 72px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      background: linear-gradient(180deg, #fff 30%, #888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, #FCD34D 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .hero p { font-size: 18px; color: var(--text-secondary); max-width: 520px; margin: 0 auto 32px; line-height: 1.7; }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: var(--bg);
+      padding: 14px 28px; border-radius: 12px;
+      font-weight: 700; font-size: 15px; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--text);
+      padding: 14px 28px; border-radius: 12px; border: 1px solid var(--border);
+      font-weight: 600; font-size: 15px; text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
 
-        .links a {
-            color: #666;
-            text-decoration: none;
-            margin: 0 0.5rem;
-        }
+    /* DEVICE SHOWCASE */
+    .showcase {
+      padding: 40px 0 100px;
+      position: relative;
+    }
+    .showcase-devices {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 40px;
+      position: relative;
+    }
+    .device-phone {
+      width: 280px;
+      border-radius: 28px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 60px var(--accent-glow);
+      animation: float 6s ease-in-out infinite;
+      z-index: 2;
+    }
+    .device-tablet {
+      width: 520px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+      animation: float 6s ease-in-out infinite 1s;
+    }
+    .device-phone img, .device-tablet img { width: 100%; display: block; }
+    .showcase-caption {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 15px;
+      color: var(--text-tertiary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
 
-        .links a:hover {
-            color: #999;
-        }
-    </style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* FEATURE SECTIONS — alternating */
+    .feature-section {
+      padding: 80px 0;
+    }
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .feature-row.reverse { direction: rtl; }
+    .feature-row.reverse > * { direction: ltr; }
+    .feature-text h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .feature-text h2 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .feature-text p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+    .feature-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .feature-bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .feature-bullets li::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+    .feature-visual {
+      position: relative;
+    }
+    .feature-visual .phone-frame {
+      max-width: 300px;
+      margin: 0 auto;
+      border-radius: 28px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .feature-visual .phone-frame img { width: 100%; display: block; }
+
+    /* FULL-WIDTH IMMERSIVE SECTIONS */
+    .immersive {
+      position: relative;
+      padding: 0;
+      margin: 40px 0;
+    }
+    .immersive-img {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+    }
+    .immersive-overlay {
+      position: relative;
+      text-align: center;
+      padding: 60px 24px 40px;
+    }
+    .immersive-overlay h2 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    .immersive-overlay h2 em { font-style: normal; color: var(--accent); }
+    .immersive-overlay p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* BUY ONCE BANNER */
+    .buy-once {
+      padding: 80px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg) 100%);
+    }
+    .buy-once h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .buy-once h2 em { font-style: normal; color: var(--accent); }
+    .buy-once > .container > p { font-size: 17px; color: var(--text-secondary); margin-bottom: 32px; max-width: 580px; margin-left: auto; margin-right: auto; }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 10px 18px; border-radius: 100px;
+      font-size: 14px; font-weight: 500;
+    }
+    .pill .check { color: var(--accent); font-weight: 700; }
+
+    /* PRIVACY / TECH */
+    .tech-section { padding: 80px 0; }
+    .tech-section h2 { text-align: center; font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+    .tech-section .subtitle { text-align: center; font-size: 16px; color: var(--text-secondary); margin-bottom: 48px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .tech-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .tech-item:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .tech-item .t-icon { width: 36px; height: 36px; margin: 0 auto 12px; }
+    .tech-item .t-icon svg { width: 36px; height: 36px; }
+    .tech-item h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .tech-item p { font-size: 13px; color: var(--text-secondary); }
+
+    /* CTA */
+    .cta-section {
+      padding: 100px 0 80px;
+      text-align: center;
+      position: relative;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .cta-section p { font-size: 17px; color: var(--text-secondary); margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+    }
+    footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-left { font-size: 13px; color: var(--text-tertiary); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 13px; color: var(--text-tertiary); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+
+    /* PRIVACY & SYNC SECTION */
+    .privacy-section {
+      padding: 100px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .privacy-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 900px; height: 900px;
+      background: radial-gradient(ellipse, rgba(218,165,32,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .privacy-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .privacy-header h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .privacy-header h2 em { font-style: normal; color: var(--accent); }
+    .privacy-header p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+    .privacy-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .privacy-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .privacy-card .card-icon {
+      width: 48px; height: 48px;
+      background: rgba(218,165,32,0.12);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .privacy-card .card-icon svg { width: 24px; height: 24px; }
+    .privacy-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .privacy-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+    .sync-providers {
+      text-align: center;
+    }
+    .sync-providers h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 28px;
+    }
+    .provider-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .provider-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .provider-icon {
+      width: 56px; height: 56px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .provider-icon:hover { border-color: var(--accent); transform: scale(1.08); }
+    .provider-icon svg { width: 28px; height: 28px; }
+    .provider-label { font-size: 12px; color: var(--text-tertiary); font-weight: 500; }
+
+    @media (max-width: 900px) {
+      .privacy-grid { grid-template-columns: 1fr; }
+      .provider-row { gap: 24px; }
+    }
+
+    /* SCROLL ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .feature-row { grid-template-columns: 1fr; gap: 40px; }
+      .feature-row.reverse { direction: ltr; }
+      .feature-visual { order: -1; }
+      .showcase-devices { flex-direction: column; align-items: center; gap: 24px; }
+      .device-tablet { width: 90%; max-width: 500px; }
+      .device-phone { width: 220px; }
+      .tech-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links a:not(.btn-nav) { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 36px; letter-spacing: -1px; }
+      .device-phone { width: 200px; }
+      .tech-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      footer .container { flex-direction: column; text-align: center; }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- NAV -->
+  <nav>
     <div class="container">
-        <h1>Trelk</h1>
-        <p>Remember what you read.<br>Coming soon.</p>
-        <span class="badge">Buy once. Own forever.</span>
-        <div class="links">
-            <a href="privacy.html">Privacy</a>
-            <a href="terms.html">Terms</a>
-        </div>
+      <a href="#" class="nav-logo">Trelk</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#technology">Technology</a>
+        <a href="#download" class="btn-nav">Get Trelk</a>
+      </div>
     </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge reveal"><strong>Buy once.</strong> No subscriptions, ever.</div>
+      <h1 class="reveal">Read. Think.<br><em>Connect ideas.</em></h1>
+      <p class="reveal">Save articles, papers, and notes. AI discovers hidden connections across everything you read. Build a knowledge base that grows with you.</p>
+      <div class="hero-actions reveal">
+        <a href="https://apps.apple.com/us/app/trelk-read-think-connect/id6761143849" class="btn-primary">
+          <svg width="18" height="22" viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          App Store
+        </a>
+        <span class="btn-primary" style="background: var(--text); color: var(--bg); opacity: 0.5; cursor: default;">
+          <svg width="18" height="20" viewBox="0 0 512 512" fill="currentColor"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+          Google Play — Coming Soon
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEVICE SHOWCASE -->
+  <section class="showcase">
+    <div class="container">
+      <div class="showcase-devices reveal">
+        <div class="device-phone">
+          <img src="phone/01_library.png" alt="Trelk Library on phone" loading="lazy">
+        </div>
+        <div class="device-tablet">
+          <img src="tablet/01_library.png" alt="Trelk Library on tablet" loading="lazy">
+        </div>
+      </div>
+      <p class="showcase-caption reveal">Phone &middot; Tablet &middot; Your knowledge everywhere</p>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div id="features">
+
+  <!-- LIBRARY -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/01_library.png" alt="Library view" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Capture everything.<br><em>Find anything.</em></h2>
+          <p>Share URLs, scan QR codes, import PDFs, DOCX files, or write notes. Everything is automatically extracted, summarized, tagged, and embedded.</p>
+          <ul class="feature-bullets">
+            <li>Hybrid search: full-text keywords + semantic vectors</li>
+            <li>Collections, tags, and smart filters</li>
+            <li>Bulk operations with swipe gestures</li>
+            <li>Built-in PDF, web, and markdown reader</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ITEM DETAIL -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reverse reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/02_item_detail.png" alt="Item detail view" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Every piece of knowledge,<br><em>deeply understood.</em></h2>
+          <p>AI generates summaries, extracts tags, classifies content, and discovers connections to your existing library. Every item becomes part of your growing knowledge graph.</p>
+          <ul class="feature-bullets">
+            <li>AI-generated summaries and tags</li>
+            <li>Connected items by semantic similarity</li>
+            <li>Items with similar tags surfaced automatically</li>
+            <li>Related topic search for further exploration</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KNOWLEDGE GRAPH — IMMERSIVE -->
+  <section class="immersive">
+    <div class="immersive-overlay reveal">
+      <h2>See your ideas <em>come alive.</em></h2>
+      <p>A force-directed knowledge graph reveals how every item connects. Same-topic links. Cross-topic bridges. The shape of your thinking, visualized.</p>
+    </div>
+    <div class="container">
+      <img src="tablet/06_knowledge_graphs.png" alt="Knowledge graph visualization" class="immersive-img reveal" loading="lazy">
+    </div>
+  </section>
+
+  <!-- CLUSTER MAP -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/06_knowledge_clusters.png" alt="Cluster map" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Your knowledge,<br><em>mapped.</em></h2>
+          <p>AI organizes your library into semantic clusters. Each dot is an item. Each color is a topic. Pinch to zoom, tap to explore. Watch new patterns emerge as your library grows.</p>
+          <ul class="feature-bullets">
+            <li>Agglomerative clustering by semantic similarity</li>
+            <li>Auto-named clusters with AI</li>
+            <li>Tap any cluster to see its items</li>
+            <li>Rebuild on demand as your library evolves</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAG NETWORK -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reverse reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/06_knowledge_tags.png" alt="Tag network" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Discover <em>hidden connections.</em></h2>
+          <p>The tag network graph shows which topics co-occur across your library. Tap any tag to see its connections and explore the items that share it.</p>
+          <ul class="feature-bullets">
+            <li>Tags are nodes, co-occurrence forms edges</li>
+            <li>Colors match your knowledge clusters</li>
+            <li>Tap a tag in any item to jump to the graph</li>
+            <li>Navigate from tag to items and back seamlessly</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ASK -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/05_ask.png" alt="Ask - chat with your library" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Chat with your<br><em>entire library.</em></h2>
+          <p>Ask questions and get answers grounded in your own reading. Every response includes clickable source citations linking back to your original items.</p>
+          <ul class="feature-bullets">
+            <li>Retrieval-Augmented Generation (RAG) across all content</li>
+            <li>Streaming responses with source citations</li>
+            <li>Choose your AI: local on-device, OpenAI, or Anthropic</li>
+            <li>Conversation history saved and searchable</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN SOURCE AI -->
+  <section class="feature-section" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg-secondary); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 900px; height: 900px; background: radial-gradient(ellipse, rgba(218,165,32,0.06) 0%, transparent 70%); pointer-events: none;"></div>
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 48px;" class="reveal">
+        <h2 style="font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px;">No API keys? <em style="font-style: normal; color: var(--accent);">No problem.</em></h2>
+        <p style="font-size: 17px; color: var(--text-secondary); max-width: 640px; margin: 0 auto; line-height: 1.7;">Don't want to pay for closed-source LLMs? We got you. Trelk ships with open-source AI models from Hugging Face that run entirely on your device. No API keys, no subscriptions, no data leaving your phone. Ever.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="reveal">
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; transition: border-color 0.3s, transform 0.3s;" onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background: rgba(218,165,32,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.3-6.7-2.8 2.8m-5.8 5.8-2.8 2.8m0-11.4 2.8 2.8m5.8 5.8 2.8 2.8"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size: 18px; font-weight: 700;">AI Analysis</h3>
+              <span style="font-size: 12px; color: var(--accent); font-family: 'JetBrains Mono', monospace;">Qwen3-0.6B</span>
+            </div>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px;">Alibaba's latest-generation language model with 600M parameters. Supports 100+ languages, excels at summarization, classification, and tag extraction. Thinking and non-thinking modes for optimal reasoning. 32K token context window.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">Summarization</span>
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">Tag extraction</span>
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">Chat</span>
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">100+ languages</span>
+          </div>
+        </div>
+
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; transition: border-color 0.3s, transform 0.3s;" onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background: rgba(218,165,32,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V9l3-3 3 3v11"/><path d="M13 20V5l3-3 3 3v15"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="16" y1="8" x2="16" y2="8.01"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size: 18px; font-weight: 700;">Embeddings</h3>
+              <span style="font-size: 12px; color: var(--accent); font-family: 'JetBrains Mono', monospace;">EmbeddingGemma 300M</span>
+            </div>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px;">Google's state-of-the-art embedding model built from Gemma 3 and the same research behind Gemini. 300M parameters, 768-dimension vectors, 2K token context. Multilingual support for 100+ languages. Designed specifically for on-device deployment.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">Semantic search</span>
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">Clustering</span>
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">768 dimensions</span>
+            <span style="font-size: 11px; padding: 4px 10px; background: rgba(218,165,32,0.1); border-radius: 100px; color: var(--accent); font-weight: 500;">On-device</span>
+          </div>
+        </div>
+      </div>
+
+      <p style="text-align: center; margin-top: 32px; font-size: 14px; color: var(--text-tertiary); line-height: 1.7;" class="reveal">
+        Want more power? Switch to <strong style="color: var(--text-secondary);">OpenAI</strong> or <strong style="color: var(--text-secondary);">Anthropic</strong> with your own API key anytime.
+        Or swap in any GGUF model from <strong style="color: var(--accent);">Hugging Face</strong> — just paste the URL and download.
+      </p>
+    </div>
+  </section>
+
+  <!-- PULSE — DAILY BRIEFING -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reverse reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/03_pulse_01.png" alt="Pulse - daily briefing" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Your daily<br><em>knowledge briefing.</em></h2>
+          <p>Every morning, AI synthesizes your recent reading into a personalized briefing. Fresh connections between items are surfaced automatically. Never miss a pattern forming in your library.</p>
+          <ul class="feature-bullets">
+            <li>AI-generated morning briefing from recent saves</li>
+            <li>Fresh connections discovered across your library</li>
+            <li>Suggested next reads based on your interests</li>
+            <li>Scheduled push notifications at your preferred time</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PULSE — FLASH REVIEW -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/04_pulse_02.png" alt="Flash review cards" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Remember everything<br><em>with flash review.</em></h2>
+          <p>AI-generated flash cards test your recall with spaced repetition scheduling. Track your retention rate, accuracy trends, and topic performance over time.</p>
+          <ul class="feature-bullets">
+            <li>Smart spaced repetition scheduling per item</li>
+            <li>66%+ retention scores with 14-day accuracy charts</li>
+            <li>Filter by collection, topic, or review all</li>
+            <li>Topic performance breakdown shows your strongest areas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSIGHTS — IMMERSIVE -->
+  <section class="immersive">
+    <div class="immersive-overlay reveal">
+      <h2>AI analyzes your <em>knowledge landscape.</em></h2>
+      <p>Per-cluster insights reveal patterns, gaps, and suggestions. A library overview shows which areas run deep and what domains are missing.</p>
+    </div>
+    <div class="container">
+      <img src="tablet/07_knowledge_insights.png" alt="Knowledge insights" class="immersive-img reveal" loading="lazy">
+    </div>
+  </section>
+
+  <!-- COMMUNITY COLLECTIONS -->
+  <section class="feature-section" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg-secondary);">
+    <div class="container">
+      <div class="feature-row reveal">
+        <div class="feature-visual">
+          <div class="phone-frame" style="box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px var(--accent-glow);">
+            <img src="phone/10_community_collections.png" alt="Community collections" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Open-source knowledge.<br><em>Import and share.</em></h2>
+          <p>Browse curated reading lists built by the community. Import entire collections with a single tap. Every item gets processed, tagged, embedded, and connected to your library.</p>
+          <ul class="feature-bullets">
+            <li>GitHub-hosted, community-curated collections</li>
+            <li>One-tap import with full AI processing</li>
+            <li>Share your own collections with others</li>
+            <li>Auto-linking to your existing knowledge base</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTE EDITOR -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reverse reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/09_note_editor.png" alt="Note editor" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Write your thoughts.<br><em>Connect them to everything.</em></h2>
+          <p>A full markdown editor with formatting toolbar and image insertion. Your notes are embedded and clustered alongside all your other content.</p>
+          <ul class="feature-bullets">
+            <li>Full markdown with live formatting toolbar</li>
+            <li>Insert images from camera or gallery</li>
+            <li>Auto-embedded, tagged, and clustered</li>
+            <li>Auto-save as you type</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GROWTH -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row reveal">
+        <div class="feature-visual">
+          <div class="phone-frame">
+            <img src="phone/08_knowledge_growth.png" alt="Growth tracking" loading="lazy">
+          </div>
+        </div>
+        <div class="feature-text">
+          <h2>Watch your knowledge<br><em>grow.</em></h2>
+          <p>Track your reading streak, knowledge score, topic depth, and content mix. Earn milestones as your library expands. See how your knowledge evolves over time.</p>
+          <ul class="feature-bullets">
+            <li>Knowledge score, streaks, and milestones</li>
+            <li>Weekly activity charts and reading progress</li>
+            <li>Topic depth analysis by cluster</li>
+            <li>Top sources and tag distribution</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- end #features -->
+
+  <!-- BUY ONCE -->
+  <section class="buy-once">
+    <div class="container">
+      <h2 class="reveal">Pay once. <em>Own it forever.</em></h2>
+      <p class="reveal">No subscriptions. No monthly fees. No usage limits. One purchase gives you the full app, every feature, and every future update.</p>
+      <div class="pills reveal">
+        <div class="pill"><span class="check">&#10003;</span> One-time purchase</div>
+        <div class="pill"><span class="check">&#10003;</span> All features included</div>
+        <div class="pill"><span class="check">&#10003;</span> Free updates</div>
+        <div class="pill"><span class="check">&#10003;</span> No account required</div>
+        <div class="pill"><span class="check">&#10003;</span> Works fully offline</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY, OPEN FORMATS & CLOUD SYNC -->
+  <section class="privacy-section">
+    <div class="container">
+      <div class="privacy-header reveal">
+        <h2>Your data. <em>Your device.</em></h2>
+        <p>No lock-in. No proprietary formats. Everything in Trelk uses open, portable standards you can read, export, and take anywhere. Your knowledge belongs to you — not to us.</p>
+      </div>
+
+      <div class="privacy-grid">
+        <div class="privacy-card reveal">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/></svg></div>
+          <h3>Open formats everywhere</h3>
+          <p>Notes are stored as Markdown. Your database is SQLite — the most widely used database format in the world. No proprietary blobs, no walled gardens. Every byte of your data is in a format any tool can read.</p>
+        </div>
+        <div class="privacy-card reveal">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="8 11 12 15 16 11"/><path d="M20 21H4"/><path d="M4 3h16"/><polyline points="16 3 12 7 8 3"/></svg></div>
+          <h3>Import &amp; export freely</h3>
+          <p>Export your entire library as CSV or JSON anytime — every field, every tag, every connection. Import just as easily. Move between tools, run your own analysis, or archive everything outside the app. Zero friction in, zero friction out.</p>
+        </div>
+        <div class="privacy-card reveal">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+          <h3>Full backup &amp; restore</h3>
+          <p>One-tap backup of your complete SQLite database and all downloaded files to your cloud. Restore on any device, any time. Items, tags, embeddings, connections, collections, downloaded content — everything preserved, nothing left behind.</p>
+        </div>
+        <div class="privacy-card reveal">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5z"/><circle cx="12" cy="16" r="1.5"/></svg></div>
+          <h3>Private by default</h3>
+          <p>No accounts, no tracking, no data leaving your phone. AI runs entirely on-device. Cloud sync is optional and encrypted by your provider. The app works fully offline with zero configuration.</p>
+        </div>
+      </div>
+
+      <div class="sync-providers reveal">
+        <h3>Sync with your favorite cloud</h3>
+        <div class="provider-row">
+          <div class="provider-item">
+            <div class="provider-icon">
+              <img src="icons/google-drive.svg" alt="Google Drive" width="28" height="28">
+            </div>
+            <span class="provider-label">Google Drive</span>
+          </div>
+          <div class="provider-item">
+            <div class="provider-icon">
+              <img src="icons/onedrive.svg" alt="OneDrive" width="28" height="28">
+            </div>
+            <span class="provider-label">OneDrive</span>
+          </div>
+          <div class="provider-item">
+            <div class="provider-icon">
+              <img src="icons/dropbox.svg" alt="Dropbox" width="28" height="28">
+            </div>
+            <span class="provider-label">Dropbox</span>
+          </div>
+          <div class="provider-item">
+            <div class="provider-icon">
+              <img src="icons/icloud.svg" alt="iCloud" width="28" height="28">
+            </div>
+            <span class="provider-label">iCloud</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNOLOGY -->
+  <section class="tech-section" id="technology">
+    <div class="container">
+      <h2 class="reveal">Built different.</h2>
+      <p class="subtitle reveal">Privacy-first, offline-capable, powered by cutting-edge AI running on your device.</p>
+      <div class="tech-grid">
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="17" r="1"/></svg></div><h4>Privacy first</h4><p>Your data stays on your device. No accounts required.</p></div>
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><h4>Works offline</h4><p>Local AI models run entirely on your phone.</p></div>
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg></div><h4>Hybrid search</h4><p>BM25 + vector embeddings fused via Reciprocal Rank Fusion.</p></div>
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.57-3.25 3.92"/><path d="M12 2a4 4 0 0 0-4 4c0 1.95 1.4 3.57 3.25 3.92"/><path d="M12 10v4"/><rect x="4" y="14" width="16" height="8" rx="2"/><line x1="9" y1="18" x2="15" y2="18"/></svg></div><h4>Your choice of AI</h4><p>Local, OpenAI, or Anthropic. Switch anytime.</p></div>
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><line x1="9.5" y1="10" x2="6.5" y2="7.5"/><line x1="14.5" y1="10" x2="17.5" y2="7.5"/><line x1="9.5" y1="14" x2="6.5" y2="16.5"/><line x1="14.5" y1="14" x2="17.5" y2="16.5"/></svg></div><h4>Semantic clusters</h4><p>Agglomerative clustering with 2D projection.</p></div>
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V9l3-3 3 3v11"/><path d="M13 20V5l3-3 3 3v15"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="16" y1="8" x2="16" y2="8.01"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="16" y1="12" x2="16" y2="12.01"/></svg></div><h4>Vector embeddings</h4><p>768-dim on-device embeddings with smart content selection.</p></div>
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h4>Community collections</h4><p>Import curated reading lists from GitHub.</p></div>
+        <div class="tech-item reveal"><div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><h4>Cross-platform</h4><p>Android &amp; iOS. Phone &amp; tablet optimized.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="download">
+    <div class="container">
+      <h2 class="reveal">Start building your<br>knowledge base</h2>
+      <p class="reveal">Buy once, use forever. Your knowledge, your device, your control.</p>
+      <div class="hero-actions reveal">
+        <a href="https://apps.apple.com/us/app/trelk-read-think-connect/id6761143849" class="btn-primary">
+          <svg width="18" height="22" viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          App Store
+        </a>
+        <span class="btn-primary" style="background: var(--text); color: var(--bg); opacity: 0.5; cursor: default;">
+          <svg width="18" height="20" viewBox="0 0 512 512" fill="currentColor"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+          Google Play — Coming Soon
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">&copy; 2026 Trelk. Made with care in Portugal.</div>
+      <div class="footer-links">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="https://github.com/trelk-app/collections">Community</a>
+        <a href="mailto:hello@trelk.app">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+
 </body>
 </html>
