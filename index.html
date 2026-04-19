@@ -30,12 +30,15 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    html, body {
+      overflow-x: hidden;      /* both needed on mobile browsers */
+    }
+
     body {
       font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      overflow-x: hidden;
     }
 
     body::before {
